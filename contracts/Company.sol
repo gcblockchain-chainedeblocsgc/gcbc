@@ -3,6 +3,7 @@ import "zeppelin-solidity/contracts/ownership/Ownable.sol";
 
 contract Company is Ownable {
     address public owner; //owner account address (20 bytes) the Gov 
+    string public employee;
 
     enum CompanyType {Undefined, SoleProprietorship, Corporation, Trust, Association} 
     enum RegistrationStatus {Undefined, Registered, Approved, Expired} 
@@ -27,7 +28,7 @@ contract Company is Ownable {
     }
 
     function test() public pure returns (string) {
-        return ("Hello World");
+        return "Hello World";
     }
 
     function RegisterCompany(bytes32 _number, string _name, uint _companyType) public onlyOwner returns(bool success){
@@ -61,4 +62,8 @@ contract Company is Ownable {
     //     //TODO: implement setArticlesOfIncorporation
     //     return true;
     // }
+
+    function registerEmployee(string uportIdentityAddress) public {
+        employee = uportIdentityAddress;
+    }
 }
