@@ -8,18 +8,17 @@ export let uport = new Connect('Service Delivery Identifier', {
     signer: SimpleSigner('698e8a7e26ce35c9617b1e524db00edb7eb4c9af17e428c1fb2994cc70b6b5fe')
 })
 
-export const web3 = uport.getWeb3()
+export const web3 = uport.getWeb3();
+
+var mnid = require('mnid');
 
 class MainArea extends Component {
 
-  credentialsReceived = {
-    redirect: false
+  constructor(props) {
+    super(props);
+    this.state = {credentialsReceived: false};
   }
-
-  componentDidMount() {
-    
-  }
-
+s
   render() {
     
     uport.requestCredentials({
@@ -27,27 +26,22 @@ class MainArea extends Component {
       notifications: true // We want this if we want to recieve credentials
     }).then((credentials) => {
       this.credentialsReceived = true;
+      var signerAddress = mnid.decode(credentials.address);
+      
+      var contractCompiled = require('./contract/Company.json');
+      var contractAbi = contractCompiled.abi;
+      var contractCode = contractCompiled.bytecode;
+      
+      var contract = web3.eth.contract(contractAbi);//, "0xb841cc9fc4db660c64c8928cd86fc00284552744", {from:signerAddress.address, data:contractCode, gas:3000000});
+      var contractInstance = contract.at("0xb841cc9fc4db660c64c8928cd86fc00284552744");
 
-      fetch('http://localhost:5000/api/registerEmployee/', {
-        method: 'POST',
-        headers: {
-          'Accept': 'application/json',
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          address: credentials.address,
-          contract_address: '0xb841cc9fc4db660c64c8928cd86fc00284552744' // mock contract address they are joining
-        })
-      })
+      contractInstance.registerEmployee(signerAddress.address, {from:signerAddress.address, data:contractCode, gas:3000000}, function(result) {
+        
+        // do a thing
+
+      });
 
     })
-
-    const { redirect } = this.credentialsReceived;
-
-    if (redirect) {
-      console.log("asdad");
-      return <Redirect to='www.google.ca'/>;
-    }
 
     return (
       <div></div>

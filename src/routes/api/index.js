@@ -4,13 +4,8 @@ const apiRouter = express.Router();
 const bodyParser = require('body-parser');
 var jsonParser = bodyParser.json()
 
-var Web3 = require('web3');
-var web3 = new Web3(Web3.givenProvider || "http://localhost:8545");
-
-var Accounts = require('web3-eth-accounts');
-var accounts = new Accounts('http://localhost:8545');
-
-web3.eth.defaultAccount = accounts[0];
+var web3 = require('web3');
+web3.providers.HttpProvider('http://localhost:8545');
 
 const getLocations = (req, res) => {
   res.send(["hello!", "how doing?"]);
@@ -42,7 +37,6 @@ apiRouter.get('/signUp/', (req,res)=> {
   var newContract = new web3.eth.Contract(contractAbi);
 
   var contractCode = contractCompiled.bytecode;
-  console.log(contractCode);
 
   var myContract = new web3.eth.Contract(contractAbi,{from:web3.eth.accounts[0], data:contractCode, gas:3000000});
   
@@ -76,24 +70,20 @@ apiRouter.get('/update/:contractAddress/:name', (req,res)=> {
   var contractCode = contractCompiled.bytecode;
   
   var _contractInstance = new web3.eth.Contract(contractAbi,req.params.contractAddress);
-  //var myContract = _contractInstance.at(req.params.contractAddress);
 
   _contractInstance.methods.setName(req.params.name).send({from:'0x913199e0522ed92ef8769f8bec27c00105fb65f6'})
   .then(function(receipt) {
-    
-    console.log("TX Hash: "+ receipt.transactionHash);   
+    console.log("TX Hash: "+ receipt.transactionHash);
   });
 
 });
 
 apiRouter.get('/viewResults/:contractAddress', (req,res)=> {
 
-
   var contractCompiled = require('../../../build/contracts/Company.json');
   var contractAbi = contractCompiled.abi;
   
   var _contractInstance = new web3.eth.Contract(contractAbi,req.params.contractAddress);
-  //var myContract = _contractInstance.at(req.params.contractAddress);
 
   _contractInstance.methods.getName().call().then(function(v) {
     var strName= v.toString();
@@ -103,7 +93,6 @@ apiRouter.get('/viewResults/:contractAddress', (req,res)=> {
 });
 
 apiRouter.post('/registerEmployee', jsonParser, (req, res) => {
-  console.log(accounts);
 
   var contractCompiled = require('../../../build/contracts/Company.json');
   var contractAbi = contractCompiled.abi;
