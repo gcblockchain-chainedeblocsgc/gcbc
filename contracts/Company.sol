@@ -15,7 +15,7 @@ contract Company is Ownable {
         uint dateRegistered; //unix time
         RegistrationStatus registrationStatus;
         string articlesOfIncorporation; // the actual record data should be part of IPFS
-        //TODO add employees
+        mapping (address => bool) employees;
     }
 
     event Registered(address _owner, bytes32 number);
